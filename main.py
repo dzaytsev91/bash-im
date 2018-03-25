@@ -16,8 +16,8 @@ limit = 40
 
 
 class SearchForm(Form):
-    text = StringField('Текст для поиска', [InputRequired()])
-    posts = IntegerField('Кол-вот страниц для поиска',
+    text = StringField('Слово для поиска', [InputRequired()])
+    posts = IntegerField('Кол-вот цитат для поиска',
                          [InputRequired(), NumberRange(min=100, max=10000)])
 
 
@@ -32,12 +32,9 @@ async def fetch_all(session, urls):
     sem = asyncio.Semaphore(limit)
     results = await asyncio.gather(
         *[fetch(session, url, sem) for url in urls],
-        return_exceptions=True  # default is false, that would raise
+        return_exceptions=True
     )
 
-    # for idx, url in enumerate(urls):
-    #     print('{}: {}'.format(url, 'ERR' if isinstance(results[idx],
-    #                                                    Exception) else 'OK'))
     return results
 
 
@@ -97,7 +94,7 @@ async def handle_post(request):
             res = await get_all_data(session, posts, word)
             response = 'Success, count - %d' % res
     else:
-        response = 'Success, count - %d' % form.errors
+        response = ''
     return render_template(
         'index.jinja2', request, {'form': form, 'result': response}
     )
