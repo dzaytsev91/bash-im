@@ -1,3 +1,5 @@
+import re
+
 import jinja2
 import aiohttp
 import asyncio
@@ -69,10 +71,10 @@ async def get_all_data(session, posts, word):
             quotes_count += 1
             if quotes_count > posts:
                 return occurrence_count
-            words = quote.text_content().split()
+            words = re.findall(r'\w+', quote.text_content())
+            words = [word.lower() for word in words]
             if word in words:
                 occurrence_count += 1
-                print(quote.text_content())
 
     return occurrence_count
 
@@ -89,7 +91,7 @@ async def handle_post(request):
     form = SearchForm(data)
     if form.validate():
         posts = math.ceil(form.posts.data / 50)
-        word = form.text.data
+        word = form.text.data.lower()
         async with aiohttp.ClientSession() as session:
             res = await get_all_data(session, posts, word)
             response = 'Success, count - %d' % res
