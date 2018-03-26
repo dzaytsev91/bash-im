@@ -40,7 +40,7 @@ async def fetch_all(session, urls):
     return results
 
 
-async def main(posts, session):
+async def get_urls(posts, session):
     sem = asyncio.Semaphore(limit)
     html_data = await fetch(session, 'http://bash.im/', sem)
     doc = html.fromstring(html_data)
@@ -60,7 +60,7 @@ async def get_all_data(session, posts, word):
     occurrence_count = 0
     quotes_count = 0
     pages_for_scan = math.ceil(posts / 50)
-    urls = await main(pages_for_scan, session)
+    urls = await get_urls(pages_for_scan, session)
     pages = await fetch_all(session, urls)
     for page in pages:
         if not isinstance(page, str):
