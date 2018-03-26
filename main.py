@@ -67,7 +67,7 @@ async def get_all_data(session, posts, word):
         quotes = doc.xpath("//div[@class='quote']/div[@class='text']")
         for quote in quotes:
             quotes_count += 1
-            if quotes_count < posts:
+            if quotes_count > posts:
                 return occurrence_count
             words = quote.text_content().split()
             if word in words:
