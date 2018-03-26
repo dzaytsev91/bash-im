@@ -59,7 +59,8 @@ async def main(posts, session):
 async def get_all_data(session, posts, word):
     occurrence_count = 0
     quotes_count = 0
-    urls = await main(posts, session)
+    pages_for_scan = math.ceil(posts / 50)
+    urls = await main(pages_for_scan, session)
     pages = await fetch_all(session, urls)
     for page in pages:
         if not isinstance(page, str):
@@ -69,7 +70,7 @@ async def get_all_data(session, posts, word):
         quotes = doc.xpath("//div[@class='quote']/div[@class='text']")
         for quote in quotes:
             quotes_count += 1
-            if quotes_count > posts * 50:
+            if quotes_count > posts:
                 return occurrence_count
             words = re.findall(r'\w+', quote.text_content())
             words = [word.lower() for word in words]
@@ -90,7 +91,7 @@ async def handle_post(request):
     data = await request.post()
     form = SearchForm(data)
     if form.validate():
-        posts = math.ceil(form.posts.data / 50)
+        posts = form.posts.data
         word = form.text.data.lower()
         async with aiohttp.ClientSession() as session:
             res = await get_all_data(session, posts, word)
